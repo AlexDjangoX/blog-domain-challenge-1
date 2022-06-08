@@ -13,34 +13,37 @@ datasource db {
 
 model User {
   id          Int       @id @default(autoincrement())
-  username    String
+  username    String    @unique @db.VarChar(10)
+  email       String    @unique
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   profile     Profile?
-
-  posts        Post[]
+  comment     Comment[]
+  posts       Post[]
 }
 
 model Profile {
   id          Int       @id @default(autoincrement())
-  bio         String?
-  imageUrl    String?
+  bio         String?   @db.VarChar(120)
+  profileUrl  String?   
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   
-  userId      Int       @unique
+  userId      Int      
   user        User      @relation(fields: [userId], references: [id])
 }
 
 model Post {
   id          Int       @id @default(autoincrement())
-  title       String
-  content     String
+  title       String    @db.VarChar(150)
+  content     String    @db.VarChar(500)
+  published   Boolean   @default(false)
+  pictureUrl  String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  authorId    Int       @unique 
+  authorId    Int       
   author      User      @relation(fields: [authorId], references: [id])     
 
   comments    Comment[] 
@@ -48,10 +51,25 @@ model Post {
 
 model Comment {
   id          Int       @id @default(autoincrement())
-  content     String
+  content     String    @db.VarChar(250)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  writtenById Int       @unique
-  post        Post      @relation(fields: [writtenById], references: [id])
+  authorId    Int       
+  author      User      @relation(fields: [authorId], references: [id])     
+
+  postId      Int       
+  post        Post      @relation(fields: [postId], references: [id])
+
+
+  commentId Int?
+  reply     Comment?  @relation("CommentReplies", fields: [commentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+
 }
+
+
+
+  
+  
+  
